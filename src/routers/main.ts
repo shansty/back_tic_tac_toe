@@ -3,6 +3,6 @@ import { createGame } from "../controllers/main";
 
 const mainRoutes:Router = Router();
 
-mainRoutes.get('/:id', createGame)
+mainRoutes.post('/:id', createGame)
 
 export default mainRoutes;

@@ -18,25 +18,53 @@ import io from '../my_socket_io_server';
 const gamesSocket = io.of("/games");
 
 gamesSocket.on("connection", socket => {
-    socket.on("updating_game", (index, gameId, user_id)  => {
 
-        console.dir({index, gameId, user_id})
+  socket.on("start_game", (user_id) => {
+    console.log("START GAME")
+    console.dir({ user_id})
+    socket.join(user_id)
+  })
 
-        let game = games.find(el => el.gameId == gameId) 
-        if(game) {
-            if(user_id == game.player_x) {
-                game.x.push(index)
-                gamesSocket.emit('move', game, "X")
-            }
-            if(user_id == game.player_o) {
-                game.o.push(index)
-                gamesSocket.emit('move', game, "O")
-            }
-        }
-    });    
-    socket.on('disconnect', () => {
-        console.log('User disconnected:', socket.id);
-    });
+  socket.on("move", (gameId, user_id, index)  => {
+
+    console.dir({index, gameId, user_id})
+
+    const game = games.find(g => g.gameId === gameId)
+
+    console.dir({ game })
+
+    if (!game) return // TODO: handle error
+    if (![game.player_o, game.player_x].includes(user_id)) return // TODO handle error
+
+    if (game.player_x === user_id) {
+      if ((game.x.length + game.o.length) % 2 === 1) return // TODO: handle error (step "o")
+      console.log("push to x")
+      game.x.push(index) 
+    }
+
+    if (game.player_o === user_id) {
+      if ((game.x.length + game.o.length) % 2 === 0) return // TODO: handle error (step "x")
+      console.log("push to o")
+      game.o.push(index)
+    }
+
+    gamesSocket.to(game.player_x).to(game.player_o).emit(`update-${gameId}`, game)
+    
+    // let game = games.find(el => el.gameId == gameId) 
+    // if(game) {
+    //     if(user_id == game.player_x) {
+    //         game.x.push(index)
+    //         gamesSocket.emit('move', game, "X")
+    //     }
+    //     if(user_id == game.player_o) {
+    //         game.o.push(index)
+    //         gamesSocket.emit('move', game, "O")
+    //     }
+    // }
+  });    
+  socket.on('disconnect', () => {
+      console.log('User disconnected:', socket.id);
+  });
 });
 
 export const getGameResults = (req: Request, res: Response) => {

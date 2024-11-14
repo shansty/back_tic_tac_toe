@@ -1,6 +1,5 @@
 import { createServer } from 'node:http';
-import app from './my_app';
+import { app_api } from './my_app';
 
-export const server = createServer(app);
-
-export default server
+export const server_api = createServer(app_api);
+export const server_ws = createServer();

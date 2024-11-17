@@ -11,7 +11,7 @@ awaitingRoomSocket.on("connection", socket => {
   console.log("DEBUG awaitingRoomSocket connection")
     socket.on("await", (user_id)  => {
         console.dir({ user_id })
-        if (user_ids.includes(user_id)) return  // ingore duble click 
+        if (user_ids.includes(user_id)) return 
 
         socket.join(user_id);
 
@@ -29,7 +29,7 @@ awaitingRoomSocket.on("connection", socket => {
                 o: [] 
             }
             games.push(game)
-            awaitingRoomSocket.to(user_O).to(user_X).emit("gameid", { gameId, user_X, user_O })
+            awaitingRoomSocket.to(user_O).to(user_X).emit("gameid", { gameId })
             user_ids.shift();
         } else {
             user_ids.push(user_id)

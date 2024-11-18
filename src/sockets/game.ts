@@ -8,10 +8,10 @@ export const gamesSocket = io.of("/games");
 gamesSocket.on("connection", socket => {
 
   socket.on("start_game", (user_id, gameId) => {
-    console.log("START GAME")
-    console.dir({ user_id})
+
     socket.join(user_id)
     const game = games.find(g => g.gameId === gameId)
+    console.log(game)
     if(!game) {
       throw new NotFoundException("Game not found", ErrorCode.GAME_NOT_FOUND)
     }
@@ -21,15 +21,19 @@ gamesSocket.on("connection", socket => {
     if(user_id == game.player_o){
       gamesSocket.to(game.player_o).emit("determining_the_order_of_moves", "You are player O")
     }
+
+    if ((game.o.length + game.x.length) % 2 == 0) {
+      gamesSocket.to(game.player_x).to(game.player_o).emit(`order_of_move`, "X")
+    } else {
+      gamesSocket.to(game.player_x).to(game.player_o).emit(`order_of_move`, "O")
+    }
+
   })
 
   socket.on("move", (gameId, user_id, index)  => {
 
-    console.dir({index, gameId, user_id})
-
     const game = games.find(g => g.gameId === gameId)
-
-    console.dir({ game })
+    console.log(game)
 
     if (!game) {
       throw new NotFoundException("Game not found", ErrorCode.GAME_NOT_FOUND)
@@ -42,7 +46,6 @@ gamesSocket.on("connection", socket => {
       if ((game.x.length + game.o.length) % 2 === 1){
         return 
       } 
-      console.log("push to x")
       game.x.push(index) 
       gamesSocket.to(game.player_x).to(game.player_o).emit(`order_of_move`, "O")
     }
@@ -51,7 +54,6 @@ gamesSocket.on("connection", socket => {
       if ((game.x.length + game.o.length) % 2 === 0) {
         return
       } 
-      console.log("push to o")
       game.o.push(index)
       gamesSocket.to(game.player_x).to(game.player_o).emit(`order_of_move`, "X")
     }

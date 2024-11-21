@@ -8,12 +8,14 @@ export const gamesSocket = io.of("/games");
 gamesSocket.on("connection", socket => {
 
   socket.on("start_game", (user_id, gameId) => {
+    console.log("games.start_game.start")
 
     socket.join(user_id)
     const game = games.find(g => g.gameId === gameId)
     console.log(game)
     if(!game) {
-      throw new NotFoundException("Game not found", ErrorCode.GAME_NOT_FOUND)
+      return
+      // throw new NotFoundException("Game not found", ErrorCode.GAME_NOT_FOUND)
     }
     if(user_id === game.player_x) {
       gamesSocket.to(game.player_x).emit("determining_the_order_of_moves", "You are player X")
@@ -31,15 +33,16 @@ gamesSocket.on("connection", socket => {
   })
 
   socket.on("move", (gameId, user_id, index)  => {
-
+    console.log("game.move.start")
     const game = games.find(g => g.gameId === gameId)
     console.log(game)
 
     if (!game) {
-      throw new NotFoundException("Game not found", ErrorCode.GAME_NOT_FOUND)
+      return
+      // throw new NotFoundException("Game not found", ErrorCode.GAME_NOT_FOUND)
     } 
     if (![game.player_o, game.player_x].includes(user_id)) {
-      throw new NotFoundException("One or two users not found", ErrorCode.GAME_NOT_FOUND)
+      // throw new NotFoundException("One or two users not found", ErrorCode.GAME_NOT_FOUND)
     }
 
     if (game.player_x === user_id) {

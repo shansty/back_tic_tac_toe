@@ -9,6 +9,7 @@ export const awaitingRoomSocket = io.of("/awaiting_room");
 
 awaitingRoomSocket.on("connection", socket => {
     socket.on("await", (user_id)  => {
+        console.log("awaiting_room.await.start")
         console.dir({ user_id })
         
         if (user_ids.includes(user_id)) return 
@@ -37,6 +38,7 @@ awaitingRoomSocket.on("connection", socket => {
     });   
     
     socket.on("stop_awaiting", (user_id) => {
+        console.log("awaiting_room.stop_awaiting.start")
         console.log(`${user_ids} user_ids and ${user_id} user_id `)
         if (user_ids.includes(user_id)) {
             console.log(`${user_ids} before filter in stop_awaiting `)

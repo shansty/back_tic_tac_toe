@@ -1,6 +1,6 @@
-import { Game } from "../types"
+import { TypeGame } from "../types"
 
-export const games: Game[] = [
+export const games: TypeGame[] = [
     {
       gameId: 'ajfhyrncl8',
       player_x: '1',

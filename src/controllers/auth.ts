@@ -2,11 +2,12 @@ import { Request, Response } from 'express';
 import { users } from '../datas/users';
 import { secretKey } from '../datas/secret';
 import * as jwt from "jsonwebtoken";
+import { TypeUser } from '../types';
 
 
 export const sighUp = async (req: Request, res: Response) => {
 
-    const {email, password} = req.body;
+    const {email, password}: {email:string, password:string} = req.body;
     if(email== undefined || password == undefined) {
       res.status(401).json({ message: 'Invalid username or password' });
     }
@@ -16,23 +17,22 @@ export const sighUp = async (req: Request, res: Response) => {
       })
 
     if(user) {
-        res.status(409)
-        res.json({message: 'User with this email already exist'});    
+        res.status(409).json({message: 'User with this email already exist'});    
     }  else {
         const id = users.length;
-        const newUser = {
+        const newUser: TypeUser = {
         id: id,
         email: email,
         password: password
     }
     
     users.push(newUser);
-    res.json({message: `${email}, You are registered!`})
+    res.status(200).json({message: `${email}, You are registered!`})
     }
 }
 
 export const signIn =  (req: Request, res: Response) => { 
-    const {email, password} = req.body;
+    const {email, password}: {email:string, password:string} = req.body;
     if(email== undefined || password == undefined) {
       res.status(401).json({ message: 'Invalid username or password' });
     }

@@ -1,7 +1,7 @@
 import io from '../my_socket_io_server';
 import { generateRandomString } from '../utils';
 import { games } from '../datas/games';
-import { Game } from '../types';
+import { TypeGame } from '../types';
 
 let user_ids: string[] = [] 
 
@@ -22,7 +22,7 @@ awaitingRoomSocket.on("connection", socket => {
             const gameId = generateRandomString(10);
             console.dir({ gameId })
 
-            const game:Game = {
+            const game:TypeGame = {
                 gameId: gameId,
                 player_x: user_X,
                 player_o: user_O,
@@ -41,10 +41,8 @@ awaitingRoomSocket.on("connection", socket => {
         console.log("awaiting_room.stop_awaiting.start")
         console.log(`${user_ids} user_ids and ${user_id} user_id `)
         if (user_ids.includes(user_id)) {
-            console.log(`${user_ids} before filter in stop_awaiting `)
             let new_user_ids = user_ids.filter(item => item !== user_id);
             user_ids = new_user_ids;
-            console.log(`${user_ids} after filter in stop_awaiting `)
         }
     })
 

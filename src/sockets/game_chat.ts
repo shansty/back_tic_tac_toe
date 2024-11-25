@@ -10,14 +10,17 @@ gameChatSocket.on("connection", socket => {
         socket.join(user_id);
         console.log(`User_is ${user_id} join to room`)
     })
+
     socket.on("send_message", (sender: Sender, userId: string, gameId: string, message: string) => {
         console.log(`send_message.start`);
         console.dir({sender, userId, gameId, message})
 
         const game = games.find(g => g.gameId === gameId)
         if(!game) {
+            socket.emit('error-event', { message: 'Game not found', code: 404 });
             return;
         }
+        
         game.messageHistory = game.messageHistory || []; 
         const newMessage = {message, sender}
 

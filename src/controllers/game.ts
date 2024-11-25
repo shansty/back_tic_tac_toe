@@ -10,17 +10,17 @@ export const getGameResults = (req: Request, res: Response) => {
     const gameId = req.params.gameId;
     try {
         if (!token) {
-            throw new Error("Token not provided");
+            res.status(401).json({message: "Unauthorized"})
         }
 
-        jwt.verify(token, secretKey, (err: any, decoded: any) => {
+        jwt.verify(token as string, secretKey, (err: Error | null, decoded: any) => {
             if (err) {
                 res.status(403).json({ message: err.message });
                 return;
             } else {
                 const game = games.find(el => el.gameId == gameId) 
                 if(game) {
-                    res.json({game: game})
+                    res.status(200).json({game: game})
                 } else {
                     res.status(404).json({message: "No game with such gameId"})
                 }

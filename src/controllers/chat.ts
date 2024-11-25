@@ -7,14 +7,14 @@ import * as jwt from "jsonwebtoken";
 export const getUserRoleForChat = (req: Request, res: Response) => {
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1];
-    const gameId = req.body.gameId;
+    const gameId:string = req.body.gameId;
     const userId = req.params.id;
     try {
         if (!token) {
-            throw new Error("Token not provided");
+            res.status(401).json({message: "Unauthorized"})
         }
 
-        jwt.verify(token, secretKey, (err: any, decoded: any) => {
+        jwt.verify(token as string, secretKey, (err: Error | null, decoded: any) => {
             if (err) {
                 res.status(403).json({ message: err.message });
                 return;

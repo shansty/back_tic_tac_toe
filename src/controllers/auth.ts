@@ -3,6 +3,7 @@ import { users } from '../datas/users';
 import { secretKey } from '../datas/secret';
 import * as jwt from "jsonwebtoken";
 import { TypeUser } from '../types';
+import prisma from '../prisma-client';
 
 
 export const sighUp = async (req: Request, res: Response) => {
@@ -12,22 +13,32 @@ export const sighUp = async (req: Request, res: Response) => {
       res.status(401).json({ message: 'Invalid username or password' });
     }
 
-    let user = users.find(el => {
-        return el.email === email;
-      })
+    // let user = users.find(el => {
+    //     return el.email === email;
+    //   })
+
+    let user = await prisma.user.findFirst({where: {email}});
+    console.log(user)
 
     if(user) {
         res.status(409).json({message: 'User with this email already exist'});    
     }  else {
-        const id = users.length;
-        const newUser: TypeUser = {
-        id: id,
-        email: email,
-        password: password
-    }
+        user = await prisma.user.create({
+          data: {
+              email,
+              password
+          }
+      })
+      res.json(user)
+    //     const id = users.length;
+    //     const newUser: TypeUser = {
+    //     id: id,
+    //     email: email,
+    //     password: password
+    // }
     
-    users.push(newUser);
-    res.status(200).json({message: `${email}, You are registered!`})
+    // users.push(newUser);
+    // res.status(200).json({message: `${email}, You are registered!`})
     }
 }
 

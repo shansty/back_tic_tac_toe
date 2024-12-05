@@ -10,35 +10,39 @@ datasource db {
 }
 
 model User {
-  id          Int         @id @default(autoincrement())
-  email       String      @unique
-  password    String 
+  id                                 Int                 @id @default(autoincrement())
+  email                              String              @unique
+  password                           String 
+  user_name                          String              @unique
 
-  game_user    GameUser[]
-  game_message GameMessage[]
+  game_user                          GameUser[]
+  game_message                       GameMessage[]
+  game_fight_initiator               GameFight[]         @relation("Initiator") 
+  game_fight_acceptor                GameFight[]         @relation("Acceptor")
+  chat_message                       ChatMessage[]
 
   @@map("users")
 }
 
 model Game {
-  id           String      @id @default(cuid())  
-
-  game_user    GameUser[]  
-  game_move    GameMove[]
-  game_message GameMessage[]
+  id                                 String              @id @default(cuid())  
+  game_user                          GameUser[]  
+  game_move                          GameMove[]
+  game_message                       GameMessage[]
+  game_fight                         GameFight[] 
 
   @@map("games")
 }
 
 model GameUser {
-  id          Int        @id @default(autoincrement())
-  user_id     Int        
-  user        User       @relation(fields: [user_id], references: [id])
-  game_id     String     
-  game        Game       @relation(fields: [game_id], references: [id]) 
-  role        Role
+  id                                 Int                 @id @default(autoincrement())
+  user_id                            Int        
+  user                               User                @relation(fields: [user_id], references: [id])
+  game_id                            String?     
+  game                               Game?               @relation(fields: [game_id], references: [id]) 
+  role                               Role?
 
-  game_move   GameMove[]
+  game_move                          GameMove[]
 
   @@unique([user_id, game_id])
   @@map("game_users")
@@ -49,26 +53,55 @@ enum Role {
   PLAYER_O
 }
 
+enum Status {
+  PENDING
+  REJECTED
+  IN_PROCESS
+  COMPLETED
+}
+
 model GameMove {
-  id           Int          @id @default(autoincrement())
-  game_user_id Int
-  game_user    GameUser     @relation(fields: [game_user_id], references: [id])
-  move_index   Int 
-  game_id      String
-  game         Game         @relation(fields: [game_id], references: [id])     
+  id                                 Int                 @id @default(autoincrement())
+  game_user_id                       Int
+  game_user                          GameUser            @relation(fields: [game_user_id], references: [id])
+  move_index                         Int? 
+  game_id                            String
+  game                               Game                @relation(fields: [game_id], references: [id])     
 
   @@map("game_moves")
 }
 
 model GameMessage {
-  id           Int          @id @default(autoincrement())
-  game_id      String
-  game         Game         @relation(fields: [game_id], references: [id]) 
-  user_id      Int        
-  user         User         @relation(fields: [user_id], references: [id])  
-  message      String
+  id                                 Int                 @id @default(autoincrement())
+  game_id                            String
+  game                               Game                @relation(fields: [game_id], references: [id]) 
+  user_id                            Int        
+  user                               User                @relation(fields: [user_id], references: [id])  
+  message                            String
 
   @@map("game_messages")
+}
+
+model GameFight {
+  id                                 Int                 @id @default(autoincrement()) 
+  user_initiator_id                  Int
+  user_initiator                     User                @relation("Initiator", fields: [user_initiator_id], references: [id])
+  user_acceptor_id                   Int
+  user_acceptor                      User                @relation("Acceptor", fields: [user_acceptor_id], references: [id])
+  game_id                            String?
+  game                               Game?               @relation(fields: [game_id], references: [id]) 
+  status                             Status
+
+ @@map("game_fights")
+}
+
+model ChatMessage {
+  id                                 Int                 @id @default(autoincrement())
+  user_id                            Int        
+  user                               User                @relation(fields: [user_id], references: [id])  
+  message                            String
+
+ @@map("chat_messages")
 }
 
 

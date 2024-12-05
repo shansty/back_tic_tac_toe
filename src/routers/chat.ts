@@ -1,8 +1,10 @@
 import { Router } from "express";
-import { getUserRoleForChat } from "../controllers/chat";
+import { getUserRoleForChat, getGameChatMessages } from "../controllers/chat";
+import authMiddleware from "../middlewares/auth";
 
 const chatRoutes:Router = Router();
 
-chatRoutes.post('/:id', getUserRoleForChat)
+chatRoutes.post('/:id', [authMiddleware], getUserRoleForChat)
+chatRoutes.get('/:gameId', [authMiddleware], getGameChatMessages)
 
 export default chatRoutes;

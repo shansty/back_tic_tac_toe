@@ -4,8 +4,10 @@ import cors from 'cors';
 import { app_api } from './my_app';
 import { server_api, server_ws } from './my_server';
 import('./sockets/game');
-import('./sockets/main');
+import('./sockets/await');
 import('./sockets/game_chat');
+import('./sockets/players');
+import('./sockets/main_chat');
 
 
 app_api.use(express.json());

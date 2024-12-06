@@ -103,7 +103,7 @@ export const changeGameFightStatus = async (req: Request, res: Response) => {
             }
         });
         if(!completed_game_fight) {
-            return res.status(404).json({ message: "Game fight not found." });
+            return res.status(200).json({ message: "This is not challenge game." });
         }
         return res.status(200).json({ message: "Game fight already completed." });
     }

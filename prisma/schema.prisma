@@ -14,6 +14,7 @@ model User {
   email                              String              @unique
   password                           String 
   user_name                          String              @unique
+  winner_games                       Int                 @default(0) 
 
   game_user                          GameUser[]
   game_message                       GameMessage[]

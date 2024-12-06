@@ -7,14 +7,17 @@ playersSocket.on("connection", socket => {
 
     socket.on('players_start', async (msg: string) => {
         console.log(msg)
-        const players_username = await prisma.user.findMany({
+        const players = await prisma.user.findMany({
+            orderBy: { winner_games: 'desc' },
             select: {
-                user_name: true
-            }
-        })
-        console.dir({ players_username })
+                user_name: true,
+                winner_games: true, 
+            },
+        });
+        
+        console.dir({ players })
 
-        playersSocket.emit("get_all_players", players_username)
+        playersSocket.emit("get_all_players", players)
     });
 
     socket.on("throw_down_a_challenge", async (userId: number, rival_username: string) => {

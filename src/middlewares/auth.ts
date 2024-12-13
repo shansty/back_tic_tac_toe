@@ -17,15 +17,11 @@ const authMiddleware = async (req: Request, res: Response, next: NextFunction) =
   }
 
   try {
-    console.log(`TOKEN ${token}`)
     const decoded = jwt.verify(token, secret as string) as JwtPayloadWithId;
-    console.log(`DECODED ${decoded}`)
     if (!decoded.id) {
       return res.status(401).json({ message: 'Invalid token payload.' });
     }
-    console.log(`CHECK TOKEN`)
     const user = await prisma.user.findFirst({ where: { id: decoded.id } });
-    console.log(`USER ${user}`)
     if (!user) {
       return res.status(401).json({ message: 'User not found.' });
     }

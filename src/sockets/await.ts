@@ -13,9 +13,7 @@ awaitingRoomSocket.on("connection", socket => {
             }
         })
 
-        const game_user_ids =  game_users.map(user => user.user_id)
-        console.dir({game_user_ids})
-
+        const game_user_ids =  game_users.map(user => user.user_id);
         if (game_user_ids.includes(userId)) {
             console.log(`Game_user_ids include user_id`)
             return
@@ -23,17 +21,12 @@ awaitingRoomSocket.on("connection", socket => {
 
         socket.join(userId.toString());
 
-        const rooms = socket.rooms
-        console.log(`room check in awaiting`) 
-        console.dir({rooms})
-
         if (game_user_ids.length > 0) {
 
             const newGame = await prisma.game.create({
                 data: {},
             });
             const newGameId = newGame.id;
-            console.dir({newGameId})
 
             let playerX = await prisma.gameUser.create({
                 data: { 
@@ -43,8 +36,6 @@ awaitingRoomSocket.on("connection", socket => {
                 }
             });
 
-            console.dir(`${playerX} playerX + user_id  ${playerX.user_id} id ${playerX.id}`)
-
             let playerO = await prisma.gameUser.findFirst({
                 where: { 
                     user_id: game_user_ids[0],
@@ -52,12 +43,9 @@ awaitingRoomSocket.on("connection", socket => {
                 }
             });
 
-            console.dir(`${playerO} playerO + user_id  ${playerO?.user_id}`)
-
             if (!playerO) {
                 return
               }
-
 
             playerO = await prisma.gameUser.update({
                 where: { id: playerO.id },
@@ -67,10 +55,8 @@ awaitingRoomSocket.on("connection", socket => {
                 }
             })
 
-            console.dir(`${playerO} playerO after update + user_id  ${playerO.user_id} + role ${playerO.role}`)
-
             awaitingRoomSocket.to(userId.toString()).to(game_user_ids[0].toString()).emit("gameid", newGameId)
-            console.log(`${newGameId}`)
+            console.log("awaiting_room.await.end")
 
         } else {
             await prisma.gameUser.create({
@@ -79,6 +65,7 @@ awaitingRoomSocket.on("connection", socket => {
                     game_id: null
                 }
             })
+            console.log("awaiting_room.await.end")
         }
     });   
     
@@ -114,7 +101,6 @@ awaitingRoomSocket.on("connection", socket => {
 
     socket.on("join_room", (userId:number) => {
         socket.join(userId.toString())
-        const rooms = socket.rooms
     })
 
     socket.on("awaiting_for_rematch", async (userId, gameId) => {

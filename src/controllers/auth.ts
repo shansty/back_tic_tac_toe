@@ -1,5 +1,4 @@
 import { Request, Response } from 'express';
-import { secretKey } from '../data/secret';
 import * as jwt from "jsonwebtoken";
 import prisma from '../prisma-client';
 
@@ -53,7 +52,8 @@ export const signIn = async (req: Request, res: Response) => {
 
   if (user) {
     let id = user.id;
-    let token = jwt.sign({ id }, secretKey, { expiresIn: '60h' });
+    const secret = process.env.SECRET_KEY as string;
+    let token = jwt.sign({ id }, secret, { expiresIn: '60h' });
     res.status(200).json({ token });
 
   } else {

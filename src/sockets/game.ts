@@ -1,6 +1,5 @@
 import io from '../my_socket_io_server';
 import prisma from '../prisma-client';
-import { gameChatSocket } from './game_chat';
 
 export const gamesSocket = io.of("/games");
 
@@ -25,26 +24,19 @@ gamesSocket.on("connection", socket => {
             socket.emit('error-event', { message: 'Game not found', code: 404 });
             return;
         }
-        console.dir({game})
         const game_user = game.game_user.find(gu => gu.user_id === userId);
-        console.dir({game_user})
         const second_game_user = game.game_user.find(gu => gu.user_id !== userId);
-        console.dir({second_game_user})
-
 
         if (!game_user || !second_game_user) {
-            console.log("DEBUG 1")
             socket.emit('error-event', { message: 'One or two users not found', code: 404 });
             return;
         }
 
         if (game_user.role === "PLAYER_X") {
-            console.log("DEBUG 3")
             gamesSocket.to(userId.toString()).emit("determining_the_order_of_moves", "You are player X")
         }
 
         if (game_user.role === "PLAYER_O") {
-            console.log("DEBUG 4")
             gamesSocket.to(userId.toString()).emit("determining_the_order_of_moves", "You are player O")
         }
 
@@ -55,6 +47,7 @@ gamesSocket.on("connection", socket => {
         if ((game.game_move.length % 2) === 1) {
             gamesSocket.to(second_game_user.user_id.toString()).to(userId.toString()).emit(`order_of_move`, "O")
         }
+        console.log("games.start_game.end")
 
     })
 
@@ -72,14 +65,12 @@ gamesSocket.on("connection", socket => {
                 game_move: true,
             }
         })
-        console.dir({ game }, { depth: 10 })
 
         if (!game) {
             return
         }
 
         const game_players = game.game_user;
-        console.dir({ game_players })
 
         if (game_players.length != 2) {
             socket.emit('error-event', { message: 'One or two users not found', code: 404 });
@@ -87,8 +78,6 @@ gamesSocket.on("connection", socket => {
         }
 
         const currect_user = game.game_user.find(el => el.user_id === user_id);
-        console.dir({ currect_user })
-
 
         if (!currect_user) {
             return;
@@ -115,8 +104,6 @@ gamesSocket.on("connection", socket => {
                 }
             })
             game.game_move.push(move)
-            console.log(`DEBUG 1`)
-            console.log(game.game_move.length)
 
             gamesSocket.to(game_players[0].user_id.toString()).to(game_players[1].user_id.toString()).emit(`order_of_move`, "O")
         }
@@ -134,13 +121,11 @@ gamesSocket.on("connection", socket => {
                 }
             })
             game.game_move.push(move)
-            console.log(`DEBUG 2`)
-            console.log(game.game_move.length)
 
             gamesSocket.to(game_players[0].user_id.toString()).to(game_players[1].user_id.toString()).emit(`order_of_move`, "X")
         }
 
-        console.dir({ game }, { depth: 10 })
+        console.log("game.move.end")
         gamesSocket.to(game_players[0].user_id.toString()).to(game_players[1].user_id.toString()).emit(`update-${gameId}`, game)
     });
 

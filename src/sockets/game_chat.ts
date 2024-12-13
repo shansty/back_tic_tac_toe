@@ -12,7 +12,6 @@ gameChatSocket.on("connection", socket => {
 
     socket.on("send_message", async (userId: number, gameId: string, message: string) => {
         console.log(`send_message.start`);
-        console.dir({userId, gameId, message})
 
         const game = await prisma.game.findFirst({
             where: {

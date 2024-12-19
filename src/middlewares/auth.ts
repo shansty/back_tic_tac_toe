@@ -1,10 +1,7 @@
 import { NextFunction, Request, Response } from "express";
+import { IJwtPayloadWithId } from "../interfaces";
 import prisma from "../prisma-client";
 import * as jwt from "jsonwebtoken";
-
-interface JwtPayloadWithId extends jwt.JwtPayload {
-  id: number;
-}
 
 const authMiddleware = async (req: Request, res: Response, next: NextFunction) => {
     const authHeader = req.headers['authorization'];
@@ -17,7 +14,7 @@ const authMiddleware = async (req: Request, res: Response, next: NextFunction) =
   }
 
   try {
-    const decoded = jwt.verify(token, secret as string) as JwtPayloadWithId;
+    const decoded = jwt.verify(token, secret as string) as IJwtPayloadWithId;
     if (!decoded.id) {
       return res.status(401).json({ message: 'Invalid token payload.' });
     }

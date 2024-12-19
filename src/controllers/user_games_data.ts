@@ -96,7 +96,7 @@ export const completeGame = async (req: Request, res: Response) => {
         }
     })
 
-    const sheetName = `${rival_user?.user_name} number ${gameId} `
+    const sheetName = `${rival_user?.user_name} № ${gameId} `
 
     if (user?.google_id) {
         createOrUpdateGameBoardSheet(user.id, sheetName, arr_x, arr_o, winnerIndexes)

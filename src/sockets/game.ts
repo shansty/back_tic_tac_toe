@@ -1,12 +1,24 @@
 import io from '../my_socket_io_server';
 import prisma from '../prisma-client';
+import * as jwt from "jsonwebtoken";
+import { IJwtPayloadWithId } from '../interfaces';
 
 export const gamesSocket = io.of("/games");
 
 gamesSocket.on("connection", socket => {
 
+    const token = socket.handshake.auth.token;
+    const secret = process.env.SECRET_KEY;
+    if (!token) {
+        console.log('token not found game.ts')
+        socket.disconnect(true);
+    }
     socket.on("start_game", async (userId: number, gameId: string) => {
-        console.log("games.start_game.start")
+        const decoded = jwt.verify(token, secret as string) as IJwtPayloadWithId;
+        if (!decoded.id || decoded.id != userId) {
+            console.log('Decoded id not found or incorrect')
+            socket.disconnect(true);
+        }
 
         socket.join(userId.toString())
 
@@ -86,7 +98,7 @@ gamesSocket.on("connection", socket => {
 
         const taken_move = await prisma.gameMove.findFirst({
             where: {
-                move_index:index,
+                move_index: index,
                 game_id: gameId
             }
         })
@@ -94,7 +106,7 @@ gamesSocket.on("connection", socket => {
         if (currect_user.role === "PLAYER_X") {
 
             if ((game.game_move.length % 2) === 1) return
-            if(taken_move) return
+            if (taken_move) return
 
             const move = await prisma.gameMove.create({
                 data: {
@@ -111,7 +123,7 @@ gamesSocket.on("connection", socket => {
         if (currect_user.role === "PLAYER_O") {
 
             if ((game.game_move.length % 2) === 0) return
-            if(taken_move) return
+            if (taken_move) return
 
             const move = await prisma.gameMove.create({
                 data: {

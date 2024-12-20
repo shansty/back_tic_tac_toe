@@ -74,30 +74,6 @@ gameChatSocket.on("connection", socket => {
         userIds.forEach(room => {
             gameChatSocket.to(room.toString()).emit("receive_message", response);
         });
-
-
-
-
-
-
-
-
-
-        // console.dir({ response })
-        // console.log(`New message added to game history`);
-
-        // const user_ids = game.game_user.filter(game => game.game_id === gameId).map(gu => gu.user_id)
-        // console.log(user_ids)
-
-        // console.log('Debug before emit 1')
-        // const check_room = socket.rooms.has(user_ids[0].toString())
-        // console.dir({check_room})
-
-        // console.log('Debug before emit 2')
-        // const check_room1 = socket.rooms.has(user_ids[1].toString())
-        // console.dir({check_room1})
-
-        // gameChatSocket.to(user_ids[0].toString()).to(user_ids[1].toString()).emit("receive_message", response)
     })
 
     socket.on('disconnect', () => {

@@ -14,29 +14,33 @@ type TypeResponseData = {
 }
 
 export const generateURL = async (req: Request, res: Response) => {
-    res.header("Access-Control-Allow-Origin", 'http://localhost:3000');
-    res.header("Access-Control-Allow-Credentials", 'true');
-    res.header("Referrer-Policy", "no-referrer-when-downgrade");
-    const redirectURL = 'http://localhost:3001/auth/google';
-
-    const oAuth2Client = new OAuth2Client(
-        process.env.CLIENT_ID,
-        process.env.CLIENT_SECRET,
-        redirectURL
-    )
-    const authorizeUrl = oAuth2Client.generateAuthUrl({
-        access_type: 'offline',
-        scope: [
-            "https://www.googleapis.com/auth/userinfo.profile",
-            "https://www.googleapis.com/auth/userinfo.email",
-            "https://www.googleapis.com/auth/drive.file",
-            "https://www.googleapis.com/auth/spreadsheets",
-            "openid"
-        ],
-        prompt: 'consent'
-    })
-
-    res.json({ url: authorizeUrl });
+    try {
+        res.header("Access-Control-Allow-Origin", 'http://localhost:3000');
+        res.header("Access-Control-Allow-Credentials", 'true');
+        res.header("Referrer-Policy", "no-referrer-when-downgrade");
+        const redirectURL = 'http://localhost:3001/auth/google';
+    
+        const oAuth2Client = new OAuth2Client(
+            process.env.CLIENT_ID,
+            process.env.CLIENT_SECRET,
+            redirectURL
+        )
+        const authorizeUrl = oAuth2Client.generateAuthUrl({
+            access_type: 'offline',
+            scope: [
+                "https://www.googleapis.com/auth/userinfo.profile",
+                "https://www.googleapis.com/auth/userinfo.email",
+                "https://www.googleapis.com/auth/drive.file",
+                "https://www.googleapis.com/auth/spreadsheets",
+                "openid"
+            ],
+            prompt: 'consent'
+        })
+    
+        res.json({ url: authorizeUrl });
+    } catch(err) {
+        console.log(err)
+    }  
 }
 
 

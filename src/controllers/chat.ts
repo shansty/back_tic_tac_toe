@@ -3,6 +3,7 @@ import prisma from '../prisma-client';
 
 
 export const getUserRoleForChat = async (req: Request, res: Response) => {
+
     const gameId: string = req.body.gameId;
     const userId = req.params.id;
 
@@ -19,7 +20,6 @@ export const getUserRoleForChat = async (req: Request, res: Response) => {
         res.status(404).json({ message: "Game not found" })
         return;
     }
-    console.log(`AXIOS game == ${game} and gameId == ${gameId}`)
     const user_role = game.game_user.find(gu => gu.user_id === +userId)?.role
 
     if (user_role) {
@@ -31,8 +31,8 @@ export const getUserRoleForChat = async (req: Request, res: Response) => {
 
 
 export const getGameChatMessages = async (req: Request, res: Response) => {
+    
     const gameId: string = req.params.gameId;
-
 
     const game = await prisma.game.findFirst({
         where: {

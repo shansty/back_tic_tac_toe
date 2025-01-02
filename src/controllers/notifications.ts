@@ -14,9 +14,9 @@ export const getNotifications = async (req: Request, res: Response) => {
     })
     if (!game_fights) {
         res.status(200).json({ notifications: [] })
-        console.log("Pending game fights are empty")
         return;
     }
+
     const rival_users_id = game_fights.map(game_fight => game_fight.user_initiator_id)
     const rival_users = await Promise.all(
         rival_users_id.map(id => prisma.user.findFirst({ where: { id } }))
@@ -32,6 +32,7 @@ export const getNotifications = async (req: Request, res: Response) => {
     console.dir({ notifications })
     res.status(200).json({ notifications: notifications })
 };
+
 
 
 export const declineNotifications = async (req: Request, res: Response) => {
@@ -60,6 +61,7 @@ export const declineNotifications = async (req: Request, res: Response) => {
     });
     res.status(200).json({ message: "challenge was decline" })
 };
+
 
 
 export const acceptNotifications = async (req: Request, res: Response) => {

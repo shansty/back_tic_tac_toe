@@ -1,20 +1,35 @@
 import io from '../my_socket_io_server';
 import prisma from '../prisma-client';
+import * as jwt from "jsonwebtoken";
+import { IJwtPayloadWithId } from '../interfaces';
 
 export const playersSocket = io.of("/players");
 
 playersSocket.on("connection", socket => {
 
-    socket.on('players_start', async (msg: string) => {
-        console.log(msg)
-        const players_username = await prisma.user.findMany({
-            select: {
-                user_name: true
-            }
-        })
-        console.dir({ players_username })
+    const token = socket.handshake.auth.token;
+    const secret = process.env.SECRET_KEY;
+    if (!token) {
+        console.log('token not found players.ts')
+        socket.disconnect(true);
+    }
 
-        playersSocket.emit("get_all_players", players_username)
+    socket.on('players_start', async (userId: number) => {
+        const decoded = jwt.verify(token, secret as string) as IJwtPayloadWithId;
+        if (!decoded.id || decoded.id != userId) {
+            console.log('Decoded id not found or incorrect')
+            socket.disconnect(true);
+        }
+
+        const players = await prisma.user.findMany({
+            orderBy: { winner_games: 'desc' },
+            select: {
+                user_name: true,
+                winner_games: true,
+            },
+        });
+
+        playersSocket.emit("get_all_players", players)
     });
 
     socket.on("throw_down_a_challenge", async (userId: number, rival_username: string) => {
@@ -26,7 +41,7 @@ playersSocket.on("connection", socket => {
         if (!acceptor) {
             return;
         }
-        if(userId === acceptor.id) {
+        if (userId === acceptor.id) {
             return;
         }
         const check_if_challenge_exist = await prisma.gameFight.findFirst({

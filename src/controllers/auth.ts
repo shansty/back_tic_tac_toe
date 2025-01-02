@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { secretKey } from '../data/secret';
+import { scryptHash, scryptVerify } from '../utils';
 import * as jwt from "jsonwebtoken";
 import prisma from '../prisma-client';
 
@@ -7,6 +7,8 @@ import prisma from '../prisma-client';
 export const sighUp = async (req: Request, res: Response) => {
 
   const { email, password, username }: { email: string, password: string, username: string } = req.body;
+  const hashPassword = await scryptHash(password);
+
   if (email === "" || password === "" || username === "") {
     res.status(401).json({ message: 'Invalid data: some fields is empty' });
   }
@@ -18,15 +20,13 @@ export const sighUp = async (req: Request, res: Response) => {
     }
   });
 
-  console.dir({ email, password, username })
-
   if (user) {
     res.status(409).json({ message: 'User with this email or username already exist' });
   } else {
     user = await prisma.user.create({
       data: {
         email: email,
-        password: password,
+        password: hashPassword,
         user_name: username
       }
     })
@@ -37,6 +37,7 @@ export const sighUp = async (req: Request, res: Response) => {
 
 export const signIn = async (req: Request, res: Response) => {
   const { username, password }: { username: string, password: string } = req.body;
+
   if (username === "" || password === "") {
     res.status(401).json({ message: 'Username or password is empty' });
   }
@@ -44,16 +45,19 @@ export const signIn = async (req: Request, res: Response) => {
   let user = await prisma.user.findFirst({
     where: {
       user_name: username,
-      password: password,
     },
   });
 
-  console.log("user in signIn")
-  console.dir({ user })
-
   if (user) {
+    const hashPassword = user.password as string;
+    const isValid = await scryptVerify(password, hashPassword)
+    console.dir({ isValid })
+    if (!isValid) {
+      res.status(404).json({ message: "Invalid password" })
+    }
     let id = user.id;
-    let token = jwt.sign({ id }, secretKey, { expiresIn: '60h' });
+    const secret = process.env.SECRET_KEY as string;
+    let token = jwt.sign({ id }, secret, { expiresIn: '60h' });
     res.status(200).json({ token });
 
   } else {

@@ -12,8 +12,16 @@ datasource db {
 model User {
   id                                 Int                 @id @default(autoincrement())
   email                              String              @unique
-  password                           String 
+  password                           String? 
   user_name                          String              @unique
+  winner_games                       Int                 @default(0) 
+  google_id                          String?             @unique
+  access_token                        String?
+  refresh_token                       String?
+  scope                               String?
+  token_type                          String?
+  id_token                            String?
+  expiry_date                         BigInt?
 
   game_user                          GameUser[]
   game_message                       GameMessage[]

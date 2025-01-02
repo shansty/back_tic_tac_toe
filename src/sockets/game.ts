@@ -13,6 +13,7 @@ gamesSocket.on("connection", socket => {
         console.log('token not found game.ts')
         socket.disconnect(true);
     }
+
     socket.on("start_game", async (userId: number, gameId: string) => {
         const decoded = jwt.verify(token, secret as string) as IJwtPayloadWithId;
         if (!decoded.id || decoded.id != userId) {
@@ -63,8 +64,6 @@ gamesSocket.on("connection", socket => {
 
     })
 
-
-
     socket.on("move", async (gameId: string, user_id: number, index: number) => {
         console.log("game.move.start")
 
@@ -94,7 +93,6 @@ gamesSocket.on("connection", socket => {
         if (!currect_user) {
             return;
         }
-        console.dir(game.game_move.length)
 
         const taken_move = await prisma.gameMove.findFirst({
             where: {

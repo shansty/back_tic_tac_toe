@@ -14,7 +14,6 @@ export const getNotifications = async (req: Request, res: Response) => {
     })
     if (!game_fights) {
         res.status(200).json({ notifications: [] })
-        console.log("Pending game fights are empty")
         return;
     }
 

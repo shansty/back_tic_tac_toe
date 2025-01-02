@@ -134,7 +134,7 @@ awaitingRoomSocket.on("connection", socket => {
         });
         const newGameId = newGame.id;
 
-        let playerX = await prisma.gameUser.create({
+        await prisma.gameUser.create({
             data: {
                 user_id: userId,
                 game_id: newGameId,
@@ -142,7 +142,7 @@ awaitingRoomSocket.on("connection", socket => {
             }
         });
 
-        let playerO = await prisma.gameUser.create({
+        await prisma.gameUser.create({
             data: {
                 user_id: rivalUser,
                 game_id: newGameId,
@@ -151,7 +151,6 @@ awaitingRoomSocket.on("connection", socket => {
         });
         awaitingRoomSocket.to(rivalUser.toString()).to(userId.toString()).emit("gameid", newGameId)
     })
-
 
     socket.on("decline_rematch", async (rivalUser: number, userId: number) => {
         awaitingRoomSocket.to(userId.toString()).to(rivalUser.toString()).emit("decline", "Game was declined")

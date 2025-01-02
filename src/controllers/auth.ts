@@ -8,7 +8,6 @@ export const sighUp = async (req: Request, res: Response) => {
 
   const { email, password, username }: { email: string, password: string, username: string } = req.body;
   const hashPassword = await scryptHash(password);
-  console.log(`hashPassword: ${hashPassword}`)
 
   if (email === "" || password === "" || username === "") {
     res.status(401).json({ message: 'Invalid data: some fields is empty' });

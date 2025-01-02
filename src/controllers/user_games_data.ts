@@ -5,6 +5,7 @@ import { GameUser } from '@prisma/client';
 
 
 export const getUserGamesData = async (req: Request, res: Response) => {
+
     const userId = +req.params.id;
     const games = await prisma.gameFight.findMany({
         where: {
@@ -66,20 +67,18 @@ export const getUserGamesData = async (req: Request, res: Response) => {
 };
 
 
-
 export const completeGame = async (req: Request, res: Response) => {
+
     const userId = +req.params.id;
     const gameId: string = req.body.gameId;
     const winner: string = req.body.winner;
     const winnerIndexes: number[] = req.body.winnerIndexes;
-
 
     const game_users = await prisma.gameUser.findMany({
         where: {
             game_id: gameId,
         },
     })
-
     const game_user = game_users.find(user => user.user_id === userId)
     const game_user_rival = game_users.find(gu => gu !== game_user)
 
@@ -98,22 +97,28 @@ export const completeGame = async (req: Request, res: Response) => {
 
     const sheetName = `${rival_user?.user_name} № ${gameId} `
 
-    if (user?.google_id) {
-        createOrUpdateGameBoardSheet(user.id, sheetName, arr_x, arr_o, winnerIndexes)
-    }
-
-    changeNumberOfUserWinningGames(winner, game_user as GameUser, game_user_rival as GameUser)
-    const result = await changeGameFightStatus(userId, gameId);
-    if (!result.status) {
+    try {
+        if (user?.google_id) {
+            console.log("3")
+            createOrUpdateGameBoardSheet(user.id, sheetName, arr_x, arr_o, winnerIndexes)
+        }
+    
+        changeNumberOfUserWinningGames(winner, game_user as GameUser, game_user_rival as GameUser)
+        console.log("4")
+        const result = await changeGameFightStatus(userId, gameId);
+        console.log("5")
+        if (!result.status) {
+            return res.status(200).json({ message: result.message });
+        }
         return res.status(200).json({ message: result.message });
-    }
-    return res.status(200).json({ message: result.message });
+    } catch(err) {
+        console.log(err)
+    } 
 };
 
 
-
-
 const changeGameFightStatus = async (userId: number, gameId: string) => {
+
     const game_fight = await prisma.gameFight.findFirst({
         where: {
             OR: [
@@ -238,6 +243,7 @@ const changeNumberOfUserWinningGames = async (winner: string, game_user: GameUse
 
 
 const getArrXArrOIndexes = async (game_users: GameUser[], userId: number, gameId: string) => {
+
     const game_user = await prisma.gameUser.findFirst({
         where: {
             user_id: userId,
@@ -263,18 +269,14 @@ const getArrXArrOIndexes = async (game_users: GameUser[], userId: number, gameId
 
     if (game_user?.role === "PLAYER_X") {
         arr_x.push(...(game_user_move_indexes as number[]));
-        console.log(`arr_x if game user is X: ${arr_x}`);
     } else {
         arr_o.push(...(game_user_move_indexes as number[]));
-        console.log(`arr_o if game user is O: ${arr_o}`);
     }
 
     if (game_user_rival?.role === "PLAYER_X") {
         arr_x.push(...(game_user_rival_move_indexes as number[]));
-        console.log(`arr_x if game user rival is X: ${arr_x}`);
     } else {
         arr_o.push(...(game_user_rival_move_indexes as number[]));
-        console.log(`arr_o if game user is O: ${arr_o}`);
     }
     console.dir({ arr_x, arr_o })
 

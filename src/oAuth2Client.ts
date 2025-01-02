@@ -1,5 +1,4 @@
 import { OAuth2Client } from "google-auth-library";
-import { google } from "googleapis";
 import prisma from "./prisma-client";
 
 const redirectURL = "http://localhost:3001/auth/google";

@@ -1,6 +1,7 @@
 import { google } from "googleapis";
 import { getAuthenticatedClientForUser } from "../oAuth2Client";
 
+
 export const createOrUpdateGameBoardSheet = async (
     user_id: number,
     rival_username: string,
@@ -142,8 +143,7 @@ export const createOrUpdateGameBoardSheet = async (
             requestBody: {
                 requests: updateRequests,
             },
-        });
-
+        })
         console.log(`Spreadsheet updated successfully. URL: https://docs.google.com/spreadsheets/d/${spreadsheetId}`);
     } catch (error) {
         console.error("Error managing game board:", error);

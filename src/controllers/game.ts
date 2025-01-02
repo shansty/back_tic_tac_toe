@@ -3,6 +3,7 @@ import prisma from '../prisma-client';
 
 
 export const getGameResults = async (req: Request, res: Response) => {
+
     const gameId = req.params.gameId;
     let game = await prisma.game.findFirst({
         where: {
@@ -15,8 +16,6 @@ export const getGameResults = async (req: Request, res: Response) => {
     })
     if (game) {
         res.status(200).json({ game: game })
-        console.log(`inside getGameRes`)
-        console.dir({ game })
     } else {
         res.status(404).json({ message: "No game with such gameId" })
     }

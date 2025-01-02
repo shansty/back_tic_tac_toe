@@ -3,7 +3,9 @@ import { IJwtPayloadWithId } from "../interfaces";
 import prisma from "../prisma-client";
 import * as jwt from "jsonwebtoken";
 
+
 const authMiddleware = async (req: Request, res: Response, next: NextFunction) => {
+
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1];
 

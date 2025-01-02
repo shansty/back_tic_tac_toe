@@ -29,8 +29,6 @@ playersSocket.on("connection", socket => {
             },
         });
 
-        console.dir({ players })
-
         playersSocket.emit("get_all_players", players)
     });
 
